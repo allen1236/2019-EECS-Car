@@ -28,14 +28,13 @@ Sensors sensors;
 //== function difinition ==============================
 
 void Sensors::update_array() {
-    _sensor[0] = analogRead(L2) > 700 ? false : true;
-    _sensor[1] = analogRead(L1) > 700 ? false : true;
-    _sensor[2] = analogRead(M0) > 700 ? false : true;
-    _sensor[3] = analogRead(R1) > 700 ? false : true;
-    _sensor[4] = analogRead(R2) > 700 ? false : true;
+    _sensor[0] = analogRead(L2) < 700 ? false : true;
+    _sensor[1] = analogRead(L1) < 700 ? false : true;
+    _sensor[2] = analogRead(M0) < 700 ? false : true;
+    _sensor[3] = analogRead(R1) < 700 ? false : true;
+    _sensor[4] = analogRead(R2) < 700 ? false : true;
 }
 void Sensors::update() { 
-
     update_array();
 
     bool line_start = false;
@@ -64,7 +63,6 @@ void Sensors::update() {
         _center = 0;
         _width = 0;
     }
-    
 }
 
 #endif

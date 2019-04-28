@@ -13,7 +13,13 @@
 
 int vl = 0, vr = 0;
 float degree_per_sec = 190.0;
-float distance_per_sec = 20.0;
+float cmps = 20.0;
+
+enum Keyword {
+    k_right,
+    k_left
+};
+
 
 //== function declaration ==============================
 
@@ -26,6 +32,7 @@ void track_step_in();
 // just set the speed
 void track_on_line();
 
+void smooth_turn();
 void turn( float _degree );
 void go( float _distance );
 
@@ -53,7 +60,6 @@ void track_step_in() {
     } while ( sensors.get_center() != 0 );
 }
 void track_on_line() {
-
     if ( sensors.out_of_range() ) {
         setSpd( -255, -255 );
         return;
@@ -72,6 +78,25 @@ void track_on_line() {
         _vr *= ( 6 - ( -line_pos ) ) / 6.0;
     }
     setSpd( _vl, _vr );
+}
+void smooth_turn( Keyword k ) {
+    int t = 0;
+    int ter = 1000 * 20.0 / cmps;
+    int _vl, _vr;
+    if ( k == k_left ) {
+        _vl = 50;
+        _vr = 255;
+    } else {
+        _vl = 255;
+        _vr = 50;
+    }
+    while( t < ter ) {
+        setSpd( _vl, _vr );
+        motor();
+        delay( dt );
+        t += dt;
+    }
+    mode = mode_track;
 }
 void turn( float _degree ) {
     //TODO

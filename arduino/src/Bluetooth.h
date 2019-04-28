@@ -30,18 +30,20 @@ bool readMsg() {
         while ( BT.available() ) {
 
             msgRead_char = (char) BT.read();
-            msgRead_buff.concat( msgRead_char );
-
             if ( msgRead_char == '\n' ) {
                 ter = true;
                 msgRead = msgRead_buff;
                 msgRead_buff = "";
                 break;
             }
+            msgRead_buff.concat( msgRead_char );
         }
 
         #ifdef SEND_RESPONSE
-        if ( ter ) BT.write( msgRead.c_str() );
+        if ( ter ) {
+            BT.write( msgRead.c_str() );
+            BT.write( '\n' );
+        }
         #endif
 
         return ter;

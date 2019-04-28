@@ -13,7 +13,7 @@ void command();
 //== function definition ==============================
 
 void track() {
-    BT.write( "*** start tracking ***\n" );
+    BT.write( "track\n" );
     //TODO make sure it is receiving commands
 
     while( mode == mode_track ) {
@@ -28,7 +28,7 @@ void track() {
             if ( run_command_after_track ) {
                 //TODO verify the command
                 mode = mode_command;
-                BT.write( "*** reach the edge ***\n" );
+                BT.write( "reach\n" );
             }
         }
         track_on_line();    
@@ -66,8 +66,15 @@ void control() {
 }
 void command() {
     //TODO
-    mode = mode_control;
-    run_command_after_track = false;
+    BT.write( "run cmd: " );
+    BT.write( msgRead.c_str() );
+    BT.write( '\n' );
+    if ( msgRead == "sr" ) smooth_turn( k_right ); 
+    else if ( msgRead == "sl" ) smooth_turn( k_left );
+    else {
+        mode = mode_control;
+        run_command_after_track = false;
+    }
 }
 
 #endif
