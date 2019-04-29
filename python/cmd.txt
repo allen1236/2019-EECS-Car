@@ -1,2 +1,7 @@
-sr
+nf
+nr
+ng
+nl
+nf
 stop
+

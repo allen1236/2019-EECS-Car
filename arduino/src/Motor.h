@@ -9,11 +9,13 @@
 #define IN4 2
 
 #define SCALE_VR 1
-#define SCALE_VL 1
+#define SCALE_VL 0.9
 
 int vl = 0, vr = 0;
-float degree_per_sec = 190.0;
+float dps = 210.0;
+float dpms = dps / 1000;
 float cmps = 20.0;
+float cmpms = cmps / 1000;
 
 enum Keyword {
     k_right,
@@ -81,7 +83,7 @@ void track_on_line() {
 }
 void smooth_turn( Keyword k ) {
     int t = 0;
-    int ter = 1000 * 20.0 / cmps;
+    int ter = 25.0 / cmpms;
     int _vl, _vr;
     if ( k == k_left ) {
         _vl = 50;
@@ -96,13 +98,37 @@ void smooth_turn( Keyword k ) {
         delay( dt );
         t += dt;
     }
-    mode = mode_track;
 }
 void turn( float _degree ) {
-    //TODO
+    int _vl = 255, _vr = -255;
+    if ( _degree < 0 ) {
+        _vl = -255;
+        _vr = 255;
+        _degree = - _degree;
+    }
+    int t = 0;
+    int ter = _degree / dpms;
+    while( t < ter ) {
+        setSpd( _vl, _vr );
+        motor();
+        delay( dt );
+        t += dt;
+    }
 }
 void go( float _distance ) {
-    //TODO
+    int _vl = 255, _vr = 255;
+    if( _distance < 0 ) {
+        _vl = _vr = -255;
+        _distance = - _distance;
+    }
+    int t = 0;
+    int ter = _distance / cmpms;
+    while( t < ter ) {
+        setSpd( _vl, _vr );
+        motor();
+        delay( dt );
+        t += dt;
+    }
 }
 
 #endif

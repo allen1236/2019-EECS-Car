@@ -61,7 +61,6 @@ void control() {
         read_RFID();
         motor();
         delay( dt );
-        
     }
 }
 void command() {
@@ -69,12 +68,29 @@ void command() {
     BT.write( "run cmd: " );
     BT.write( msgRead.c_str() );
     BT.write( '\n' );
-    if ( msgRead == "sr" ) smooth_turn( k_right ); 
-    else if ( msgRead == "sl" ) smooth_turn( k_left );
+    
+    // if-else expression of cmds
+    if ( msgRead == "nr" ) {
+        smooth_turn( k_right );
+    }
+    else if ( msgRead == "nl" ) {
+        smooth_turn( k_left );
+    }
+    else if ( msgRead == "nf") {
+        go( 20.0 );
+    }
+    else if ( msgRead == "ng" ) {
+        go( 10.0 );
+        read_RFID();
+        go( -10.0 );
+        turn( 180.0 );
+    }
     else {
         mode = mode_control;
         run_command_after_track = false;
+        return;
     }
+    mode = mode_track;
 }
 
 #endif

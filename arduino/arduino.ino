@@ -8,9 +8,9 @@ enum Mode {
 } mode = mode_control;
 
 #include "src/Bluetooth.h"
+#include "src/RFID.h"
 #include "src/Sensor.h"
 #include "src/Motor.h"
-#include "src/RFID.h"
 #include "src/Control.h"
 
 //== setup and main loop ==============================
