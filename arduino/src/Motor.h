@@ -9,7 +9,7 @@
 #define IN4 2
 
 #define SCALE_VR 1
-#define SCALE_VL 0.9
+#define SCALE_VL 0.95
 
 int vl = 0, vr = 0;
 float dps = 210.0;
@@ -37,6 +37,7 @@ void track_on_line();
 void smooth_turn();
 void turn( float _degree );
 void go( float _distance );
+
 
 //== function definition ==============================
 

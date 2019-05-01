@@ -1,7 +1,3 @@
-nf
-nr
-ng
-nl
-nf
+test
 stop
 

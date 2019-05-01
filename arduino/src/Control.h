@@ -85,7 +85,11 @@ void command() {
         go( -10.0 );
         turn( 180.0 );
     }
+    else if ( msgRead == "test" ) {
+        go( 200 );
+    }
     else {
+        BT.write( "cmd error, return to control mode\n" );
         mode = mode_control;
         run_command_after_track = false;
         return;
