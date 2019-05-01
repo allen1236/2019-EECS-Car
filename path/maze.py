@@ -14,13 +14,14 @@ class Maze:
         self.nd_dict = dict()
 
         # process raw_data
-        dead_end = []
-        print(dead_end)
+        self.dead_end = []
+        
         for dt in self.raw_data:
             nd = node.Node(dt[0])
             for i in range(1,5):
                 if not math.isnan(dt[i]):
                     nd.setSuccessor(int(dt[i]))
+                self.nd_dict[dt[0]] = nd
     
         for dt in self.raw_data:
             count = 0
@@ -28,15 +29,17 @@ class Maze:
             for i in range (1,5):
                 if math.isnan(dt[i]):
                     count += 1
+                    
             if count == 3:
-                dead_end.append(int(dt[0]))
-
-            self.nd_dict[dt[0]] = nd
+                self.dead_end.append(int(dt[0]))
+               
         
-        print(dead_end) 
+        
         #print self.self.nd_dict
         #for i in range(1, len(self.nd_dict)+1):
         #print(i,self.nd_dict[i].getSuccessors())
+
+        
     
     def shortestPath(self, nd_from, nd_to):
         """ 
@@ -46,47 +49,21 @@ class Maze:
                  |    |  ->  shortestPath(1,4) returns [1,2,4]
                  4 -- 5
         """
-        Q = []
-        d = {}
-        pi = {}
-        marked = []
-
-        #initialization
-        Q.append(self.nd_dict[nd_from])
-        marked.append(self.nd_dict[nd_from])
-        d[self.nd_dict[nd_from]] = 0
-
-        while len(Q) != 0:
-            u = Q.pop(0)
-            
-            successor = u.getSuccessors()
-            for v in successor:
-                if self.nd_dict[v] not in marked:
-                    marked.append(self.nd_dict[v])
-                    Q.append(self.nd_dict[v])
-                    d[self.nd_dict[v]] = d[u] + 1
-                    pi[self.nd_dict[v]] = u
-        path = []
-        tank = self.nd_dict[nd_to]
-        while True:
-            path.append(tank)
-            if tank.getIndex() == nd_from:
-                break
-            tank = pi[tank]
-        
-        path = path[::-1] 
-        path_result = []
-        
-        for i in range(len(path)):
-            index = path[i].getIndex()
-            path_result.append(int(index))
-
-        return path_result
-
-     
-
-             
-             
-         
-
-
+        path = dict()
+        unexplored = [nd_from] 
+        while nd_to not in path:
+            if len(unexplored) == 0:
+                return []
+            unexplored_copy = list(unexplored)
+            for nd in unexplored_copy:
+                for neighbor in self.nd_dict[nd].getSuccessors():
+                    if neighbor not in path:
+                        unexplored.append(neighbor)
+                        path[neighbor] = nd
+                unexplored.remove(nd)
+        pos = nd_to
+        ans = [ nd_to ]
+        while pos is not nd_from:
+            ans = [ path[pos] ] + ans
+            pos = path[pos]
+        return ans
