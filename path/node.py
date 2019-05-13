@@ -30,9 +30,10 @@ class Node:
 
     def getDirection( self, nd ):
         if nd in self.successors:
-            return self.direction[ nd ]
+            return self.directions[ nd ]
         else:
-            return None
+            print( "Error: path doesn't exist!" )
+            return 0 
 
     def getDistances( self ):
         return self.successors

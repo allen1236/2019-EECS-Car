@@ -99,21 +99,17 @@ class Maze:
     def get_distances( self ):
         
         dead_end = self.dead_end
-        print( dead_end )
         path_len = dict()
         for i in dead_end:
             path_list = self.shortestPath_list( i, dead_end )
             for j in path_list:
                 path_len[(i,j)] = path_list[ j ] 
-                print( self.shortestPath( i, j )) 
         return path_len
 
     def find_path( self, distances ):
         path = [ self.dead_end[0] ]
+        #TODO
             
-
-        
-        
 
         
         return path
@@ -121,7 +117,31 @@ class Maze:
     def find_full_path( self, path ):
         full_path = []
 
+        for i in range(len(path)-1):
+            separated_path = self.shortestPath(path[i], path[i+1])
+            
+            tuple(separated_path)
+
+            for j in range(len(separated_path)):
+                full_path.append(separated_path[j])
+                
+        full_path.append(path[-1])
+        
+        print( full_path )
         return full_path
 
-    def generate_cmd( self, cmd ):
-        pass
+    def generate_cmd( self, cmd, full_path ):
+        #TODO write to file
+        cmd=[]
+        for i in range(len(full_path)-2):
+            A=int(self.nd_dict[full_path[i]].getDirection(full_path[i+1]))-int(self.nd_dict[full_path[i+1]].getDirection(full_path[i+2]))
+            if A==-3 or A==1:
+                cmd.append('nl')
+            if A==-1 or A==3:
+                cmd.append('nr')
+            if A==0:
+                cmd.append('nf')
+            if A==2 or A==-2:
+                cmd.append('ng')
+        print(cmd)
+
