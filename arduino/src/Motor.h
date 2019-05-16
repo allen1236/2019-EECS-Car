@@ -14,7 +14,7 @@
 int vl = 0, vr = 0;
 float dps = 210.0;
 float dpms = dps / 1000;
-float cmps = 20.0;
+float cmps = 18.0;
 float cmpms = cmps / 1000;
 
 enum Keyword {
@@ -84,14 +84,14 @@ void track_on_line() {
 }
 void smooth_turn( Keyword k ) {
     int t = 0;
-    int ter = 25.0 / cmpms;
+    int ter = 28.0 / cmpms;
     int _vl, _vr;
     if ( k == k_left ) {
-        _vl = 50;
+        _vl = 65;
         _vr = 255;
     } else {
         _vl = 255;
-        _vr = 50;
+        _vr = 65;
     }
     while( t < ter ) {
         setSpd( _vl, _vr );

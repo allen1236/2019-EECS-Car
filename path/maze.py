@@ -11,20 +11,14 @@ class Maze:
         self.raw_data = pandas.read_csv(filepath).values
         # graph if saved here
         self.nd_dict = dict()
-
-        # process raw_data
-        self.dead_end = [1]
-
         direction = {1:1, 2:3, 3:4, 4:2}
-        
+        # process raw_data
         for dt in self.raw_data:
             nd = node.Node(dt[0])
             for i in range(1,5):
                 if not math.isnan(dt[i]):
                     nd.setSuccessor( int(dt[i]), direction[i], int(dt[i+4]) )
             self.nd_dict[dt[0]] = nd
-            if nd.isEnd():
-                self.dead_end.append( int(dt[0]) )
     
     def shortestPath(self, nd_from, nd_to):
 
@@ -48,10 +42,9 @@ class Maze:
                 if end:
                     unexplored.remove(nd)
 
-        ans = [] 
+        ans = [ nd_to ] 
         distances = 0 
         pos = nd_to
-
         while pos is not nd_from:
             ans = [ path[pos] ] + ans
             distances += self.nd_dict[ pos ].getDistances()[ path[pos] ]
@@ -63,10 +56,11 @@ class Maze:
     def shortestPath_list(self, nd_from, nds_to):
 
         path = dict()
+        _nds_to = list( nds_to )
         unexplored = [nd_from] 
         counter = {nd_from: copy.copy( self.nd_dict[nd_from].getDistances() )} 
 
-        while len(unexplored) > 0:
+        while len(_nds_to) > 0:
             unexplored_copy = list(unexplored)
             for nd in unexplored_copy:
                 end = True
@@ -79,6 +73,8 @@ class Maze:
                             unexplored.append(neighbor)
                             counter[neighbor] = copy.copy( self.nd_dict[neighbor].getDistances() )
                             path[neighbor] = nd
+                            if neighbor in _nds_to:
+                                _nds_to.remove( neighbor )
                 if end:
                     unexplored.remove(nd)
 
@@ -96,52 +92,54 @@ class Maze:
             distances[ nd_to ] += len( paths[ nd_to ] ) - 1
         return distances 
 
-    def get_distances( self ):
+    def get_distances( self, start_point, _deadends ):
         
-        dead_end = self.dead_end
         path_len = dict()
-        for i in dead_end:
-            path_list = self.shortestPath_list( i, dead_end )
+        deadends = [ start_point ] + _deadends
+        for i in deadends:
+            path_list = self.shortestPath_list( i, deadends )
             for j in path_list:
                 path_len[(i,j)] = path_list[ j ] 
         return path_len
 
-    def find_path( self, distances ):
-        path = [ self.dead_end[0] ]
-        #TODO
-            
-
-        
+    def find_path( self, distances, start_point, deadends ):
+        path = [ start_point ]
+        total_len = 0
+        for dead_end_add in deadends:
+            insert_pos = 0
+            smallest = -1
+            for i in range(len(path)):
+                compare = total_len + distances[(path[i], dead_end_add)]
+                if i != len(path) - 1:
+                    compare -= distances[(path[i], path[i+1])]
+                    compare += distances[(dead_end_add, path[i+1])]
+                if smallest == -1 or compare < smallest:
+                    insert_pos = i
+                    smallest = compare
+            path.insert( insert_pos+1, dead_end_add )
+            total_len += smallest
         return path
 
     def find_full_path( self, path ):
-        full_path = []
-
-        for i in range(len(path)-1):
-            separated_path = self.shortestPath(path[i], path[i+1])
-            
-            tuple(separated_path)
-
-            for j in range(len(separated_path)):
-                full_path.append(separated_path[j])
-                
-        full_path.append(path[-1])
-        
-        print( full_path )
+        full_path = [ path[0] ]
+        for nd_from, nd_to in zip( path[:-1], path[1:] ):
+            full_path += self.shortestPath( nd_from, nd_to )[1:]
         return full_path
 
-    def generate_cmd( self, cmd, full_path ):
-        #TODO write to file
-        cmd=[]
+    def generate_cmd( self, cmd, full_path, deadends ):
+        cmds=[]
         for i in range(len(full_path)-2):
             A=int(self.nd_dict[full_path[i]].getDirection(full_path[i+1]))-int(self.nd_dict[full_path[i+1]].getDirection(full_path[i+2]))
             if A==-3 or A==1:
-                cmd.append('nl')
+                cmds.append('nl')
             if A==-1 or A==3:
-                cmd.append('nr')
+                cmds.append('nr')
             if A==0:
-                cmd.append('nf')
+                cmds.append('nf')
             if A==2 or A==-2:
-                cmd.append('ng')
-        print(cmd)
+                cmds.append('ng')
+        print(cmds)
+        for c in cmds:
+            cmd.write( c + '\n' )
+        cmd.write( 'stop' )
 

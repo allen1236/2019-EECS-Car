@@ -2,6 +2,7 @@ import threading
 import time
 import sys
 import serial
+from score import *
 
 
 class bluetooth:
@@ -50,6 +51,7 @@ def read():
     cmds = [ k.strip() for k in inf ]
     cmd_counter = 0
     halt = False
+    scoreboard = Scoreboard( "./UID.csv" )
     while True:
         if bt.waiting():
             msg = bt.readString()
@@ -61,6 +63,10 @@ def read():
                     cmd_counter += 1
                     if cmd_counter >= len(cmds):
                         cmd_counter = 0
+                elif msg[:4] = "RFID":
+                    rfid = msg[7:]
+                    scoreboard.add_UID( rfid )
+                    print( 'current score:', scoreboard.getCurrentScore() )
 
 def write():
     while True:
