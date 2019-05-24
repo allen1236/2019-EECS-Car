@@ -32,8 +32,7 @@ class Node:
         if nd in self.successors:
             return self.directions[ nd ]
         else:
-            print( "Error: path doesn't exist!" )
-            return 0 
+            return None
 
     def getDistances( self ):
         return self.successors

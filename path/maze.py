@@ -141,5 +141,75 @@ class Maze:
         print(cmds)
         for c in cmds:
             cmd.write( c + '\n' )
-        cmd.write( 'stop' )
+        cmd.write( 'done' )
+
+    def generate_shortcut( self, total_map ):
+        pass
+
+    def draw_map( self, total_nodes ):
+
+        drown = []
+        image = [['01']]
+        cy, cx = 0, 0
+        sy, sx = 1, 1
+
+        def extend( image, cy, cx, sy, sx ):
+            if cy == -1:
+                image = [ [ '  ' for _ in range(sx) ] ] + image
+                cy += 1
+                sy += 1
+            elif cx == -1:
+                for y in image:
+                    y = ['  '] + y
+                cx += 1
+                sx += 1
+            elif cy >= sy:
+                image.append( [ '  ' for _ in range(sx) ] )
+                sy += 1
+            elif cx >= sx:
+                for y in image:
+                    y += ['  ']
+                sx += 1
+            return image, cy, cx, sy, sx
+        def draw_out( image, cy, cx, sy, sx, drown ):
+            me = int( image[cy][cx] )
+            drown.append( me )
+            successors = self.nd_dict[me].getDistances()
+            for s in successors:
+                direction = self.nd_dict[me].getDirection( s )
+                distance = successors[s]
+                for step in range(distance + 1): 
+                    if direction is 1:
+                        cy -= 1
+                    elif direction is 2:
+                        cx += 1
+                    elif direction is 3:
+                        cy += 1
+                    else:
+                        cx -= 1
+                    image, cy, cx, sy, sx = extend( image, cy, cx, sy, sx )
+                    # print( me, s, image, cy, cx, sy, sx )
+                    if step != distance:
+                        image[cy][cx] = '::'
+                    else:
+                        if s not in drown:
+                            drown.append(s)
+                            image[cy][cx] = format( s, '02d' )
+                            image, cy, cx, sy, sx = draw_out( image, cy, cx, sy, sx, drown )
+                        if direction is 1:
+                            cy += distance + 1
+                        elif direction is 2:
+                            cx -= distance + 1
+                        elif direction is 3:
+                            cy -=  distance + 1
+                        else:
+                            cx += distance + 1
+            return image, cy, cx, sy, sx
+        image, cy, cx, sy, sx = draw_out(image, cy, cx, sy, sx, drown)
+        print()
+        for y in image:
+            for x in y:
+                print( x, end='')
+            print()
+        print()
 

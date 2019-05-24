@@ -10,6 +10,9 @@
 
 #define SCALE_VR 1
 #define SCALE_VL 0.95
+#define SensorDistance 8 
+
+#include "Sensor.h"
 
 int vl = 0, vr = 0;
 float dps = 210.0;
@@ -36,6 +39,7 @@ void track_on_line();
 
 void smooth_turn();
 void turn( float _degree );
+void turn_and_seek( bool right );
 void go( float _distance );
 
 
@@ -82,6 +86,55 @@ void track_on_line() {
     }
     setSpd( _vl, _vr );
 }
+void turn( float _degree ) {
+    int _vl = 255, _vr = -255;
+    if ( _degree < 0 ) {
+        _vl = -255;
+        _vr = 255;
+        _degree = - _degree;
+    }
+    int t = 0;
+    int ter = _degree / dpms;
+    while( t < ter ) {
+        setSpd( _vl, _vr );
+        motor();
+        delay( dt );
+        t += dt;
+    }
+}
+void turn_and_seek( float _degree ) {
+    int _vl = 255, _vr = -255;
+    if ( _degree < 0 ) {
+        _vl = -255;
+        _vr = 255;
+        _degree = - _degree;
+    }
+    int t = 0;
+    int ter = _degree / dpms;
+    sensors.update();
+    while( t < ter && ( sensors.get_center() > 1 || sensors.get_center() < -1 )  ) {
+        setSpd( _vl, _vr );
+        motor();
+        delay( dt );
+        t += dt;
+        sensors.update();
+    }
+}
+void go( float _distance ) {
+    int _vl = 255, _vr = 255;
+    if( _distance < 0 ) {
+        _vl = _vr = -255;
+        _distance = - _distance;
+    }
+    int t = 0;
+    int ter = _distance / cmpms;
+    while( t < ter ) {
+        setSpd( _vl, _vr );
+        motor();
+        delay( dt );
+        t += dt;
+    }
+}
 void smooth_turn( Keyword k ) {
     int t = 0;
     int ter = 28.0 / cmpms;
@@ -100,36 +153,6 @@ void smooth_turn( Keyword k ) {
         t += dt;
     }
 }
-void turn( float _degree ) {
-    int _vl = 255, _vr = -255;
-    if ( _degree < 0 ) {
-        _vl = -255;
-        _vr = 255;
-        _degree = - _degree;
-    }
-    int t = 0;
-    int ter = _degree / dpms;
-    while( t < ter ) {
-        setSpd( _vl, _vr );
-        motor();
-        delay( dt );
-        t += dt;
-    }
-}
-void go( float _distance ) {
-    int _vl = 255, _vr = 255;
-    if( _distance < 0 ) {
-        _vl = _vr = -255;
-        _distance = - _distance;
-    }
-    int t = 0;
-    int ter = _distance / cmpms;
-    while( t < ter ) {
-        setSpd( _vl, _vr );
-        motor();
-        delay( dt );
-        t += dt;
-    }
-}
+
 
 #endif

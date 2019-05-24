@@ -9,6 +9,9 @@ total_nodes = 20
 def main():
 
     maze = mz.Maze( maze_path )
+
+    maze.draw_map( total_nodes )
+
     deadends = [ int(key) for key in maze.nd_dict if ( maze.nd_dict[key].isEnd() ) ]
     previous_start_point, start_point = 1, 2
 

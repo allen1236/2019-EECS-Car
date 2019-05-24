@@ -64,8 +64,7 @@ void control() {
     }
 }
 void command() {
-    //TODO
-    BT.write( "run cmd: " );
+    BT.write( "run: " );
     BT.write( msgRead.c_str() );
     BT.write( '\n' );
     
@@ -80,13 +79,21 @@ void command() {
         go( 20.0 );
     }
     else if ( msgRead == "ng" ) {
-        go( 10.0 );
-        read_RFID();
-        go( -10.0 );
-        turn( 180.0 );
+        go( 5.0 );
+        int i = 0
+        for (; i < 10; ++i) {
+            if ( read_RFID() ) break;
+            go( 1.0 )
+        }
+        go( -5.0 - i );
+        turn( 120.0 );
+        turn_and_seek( 60.0 );
     }
     else if ( msgRead == "test" ) {
         go( 200 );
+    }
+    else if ( msgRead[0] == 'c' ) {     //shortcut
+
     }
     else {
         BT.write( "cmd error, return to control mode\n" );
