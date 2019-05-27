@@ -9,15 +9,16 @@
 #define IN4 2
 
 #define SCALE_VR 1
-#define SCALE_VL 0.95
+#define SCALE_VL 0.94
 #define SensorDistance 8 
 
 #include "Sensor.h"
 
 int vl = 0, vr = 0;
-float dps = 210.0;
+float dps_fix = 14;
+float dps = 236.0;
 float dpms = dps / 1000;
-float cmps = 18.0;
+float cmps = 20.0;
 float cmpms = cmps / 1000;
 
 enum Keyword {
@@ -39,8 +40,10 @@ void track_on_line();
 
 void smooth_turn();
 void turn( float _degree );
-void turn_and_seek( bool right );
+void turn_and_seek( float _degree );
 void go( float _distance );
+void go_and_get();
+void go_and_seek();
 
 
 //== function definition ==============================
@@ -71,7 +74,6 @@ void track_on_line() {
         setSpd( -255, -255 );
         return;
     }
-
     //TODO PID control
 
     int _vl = 255, _vr = 255;
@@ -93,6 +95,7 @@ void turn( float _degree ) {
         _vr = 255;
         _degree = - _degree;
     }
+    _degree += dps_fix;
     int t = 0;
     int ter = _degree / dpms;
     while( t < ter ) {
@@ -112,7 +115,7 @@ void turn_and_seek( float _degree ) {
     int t = 0;
     int ter = _degree / dpms;
     sensors.update();
-    while( t < ter && ( sensors.get_center() > 1 || sensors.get_center() < -1 )  ) {
+    while( t < ter && ! sensors.at_center() ) {
         setSpd( _vl, _vr );
         motor();
         delay( dt );
@@ -137,14 +140,14 @@ void go( float _distance ) {
 }
 void smooth_turn( Keyword k ) {
     int t = 0;
-    int ter = 28.0 / cmpms;
+    int ter = 27 / cmpms;
     int _vl, _vr;
     if ( k == k_left ) {
-        _vl = 65;
+        _vl = 60;
         _vr = 255;
     } else {
         _vl = 255;
-        _vr = 65;
+        _vr = 60;
     }
     while( t < ter ) {
         setSpd( _vl, _vr );
@@ -153,6 +156,21 @@ void smooth_turn( Keyword k ) {
         t += dt;
     }
 }
-
+void go_and_get() {
+    while ( ! read_RFID() ) {
+        setSpd( 255, 255 );
+        motor();
+        delay( dt );
+    }
+}
+void go_and_seek() {
+    sensors.update();
+    while ( ! sensors.reach_the_edge() ) {
+        setSpd( 255, 255 );
+        motor();
+        delay( dt );
+        sensors.update();
+    }
+}
 
 #endif

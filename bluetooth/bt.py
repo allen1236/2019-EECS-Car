@@ -41,7 +41,7 @@ class bluetooth:
     def readString(self) -> str:
         receiveMsg = None
         # Scan the input buffer until meet a '\n'. return none if doesn't exist.
-        if(self.waiting()):
+        if( self.waiting() ):
             receiveMsg = self.ser.readline().decode("utf-8")[:-1]
         return receiveMsg
 
@@ -50,23 +50,51 @@ def read():
     inf = open( "./cmd.txt", "r" )
     cmds = [ k.strip() for k in inf ]
     cmd_counter = 0
-    halt = False
+    halt = True
     scoreboard = Scoreboard( "./UID.csv" )
+    check = 0
+    check_msg = 's'
+    while check < 3:
+        time.sleep( 1 );
+        if check is 0:
+            check_msg = 's'
+        elif check is 1:
+            check_msg = 'k'
+        else:
+            check_msg = 'j'
+        bt.write( check_msg + '\n' )
+        t = 0
+        while not bt.waiting():
+            time.sleep( 0.1 )
+            t += 1
+            if t > 5:
+                break
+        msg = bt.readString()
+        if msg is check_msg:
+            check += 1
+        elif check > 0:
+            check -= 1
+        print( "check state", check, "(", check_msg, "sent", msg, "recieved", ')' )
+
     while True:
         if bt.waiting():
-            msg = bt.readString()
+            try:
+                msg = bt.readString()
+            except UnicodeDecodeError:
+                continue
             print( msg )
             if not halt:
-                if msg == "track":
-                    bt.write( cmds[cmd_counter] + '\n' )
-                elif msg == "reach":
-                    cmd_counter += 1
-                    if cmd_counter >= len(cmds):
-                        cmd_counter = 0
-                elif msg[:4] = "RFID":
-                    rfid = msg[7:]
-                    scoreboard.add_UID( rfid )
-                    print( 'current score:', scoreboard.getCurrentScore() )
+                if msg is not None:
+                    if msg == "track":
+                        bt.write( cmds[cmd_counter] + '\n' )
+                    elif msg == "reach":
+                        cmd_counter += 1
+                        if cmd_counter >= len(cmds):
+                            cmd_counter = 0
+                    elif msg[:4] == "RFID":
+                        rfid = msg[7:]
+                        scoreboard.add_UID( rfid )
+                        print( 'current score:', scoreboard.getCurrentScore() )
 
 def write():
     while True:

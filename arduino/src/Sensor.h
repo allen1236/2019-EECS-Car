@@ -19,8 +19,9 @@ class Sensors{
         void update();
         int get_center() { return _center; }
         int get_width() { return _width; }
-        bool reach_the_edge() { return ( _width == 5 ); }
+        bool reach_the_edge() { return ( _width >= 5 ); }
         bool out_of_range() { return ( _width == 0 ); }
+        bool at_center() { return ( _center >= -1 && _center <= 1 && _width >= 1 ); }
 };
 
 Sensors sensors;
@@ -28,24 +29,25 @@ Sensors sensors;
 //== function difinition ==============================
 
 void Sensors::update_array() {
-    _sensor[0] = analogRead(L2) < 700 ? false : true;
-    _sensor[1] = analogRead(L1) < 700 ? false : true;
-    _sensor[2] = analogRead(M0) < 700 ? false : true;
-    _sensor[3] = analogRead(R1) < 700 ? false : true;
-    _sensor[4] = analogRead(R2) < 700 ? false : true;
+    _sensor[0] = analogRead(L2) < 800 ? false : true;
+    _sensor[1] = analogRead(L1) < 800 ? false : true;
+    _sensor[2] = analogRead(M0) < 800 ? false : true;
+    _sensor[3] = analogRead(R1) < 800 ? false : true;
+    _sensor[4] = analogRead(R2) < 800 ? false : true;
 }
 void Sensors::update() { 
     update_array();
 
     bool line_start = false;
     int line_pos = 0;
-    int last_line_pos = 4;
+    int last_line_pos = 0;
 
     for (int i = 0; i < 5; ++i) {
         if( !line_start ) {
             if( _sensor[i] ) {
                 line_start = true;
                 line_pos = i;
+                last_line_pos = 4;
             }
         }
         else {

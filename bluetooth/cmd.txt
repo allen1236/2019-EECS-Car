@@ -1,12 +1,2 @@
-nl
-nl
-nr
-nr
-ng
-nr
-nl
-nl
-ng
-nf
-nl
+cfnr
 done
