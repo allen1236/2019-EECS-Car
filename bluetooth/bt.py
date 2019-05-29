@@ -4,6 +4,11 @@ import sys
 import serial
 from score import *
 
+cmds = None
+cmd_counter = 0
+input_cmd_manually = False 
+default_cmd_path = "cmd.txt"
+UID_path = "./UIDg1.csv"
 
 class bluetooth:
     def __init__(self, port: str, baudrate: int=9600):
@@ -45,13 +50,21 @@ class bluetooth:
             receiveMsg = self.ser.readline().decode("utf-8")[:-1]
         return receiveMsg
 
-def read():
-    msg = None
-    inf = open( "./cmd.txt", "r" )
-    cmds = [ k.strip() for k in inf ]
+def read_cmd( path ):
+    inf = open( path, "r" )
+    cmds  = [ k.strip() for k in inf ]
+    inf.close()
+    global cmd_counter
     cmd_counter = 0
-    halt = True
-    scoreboard = Scoreboard( "./UID.csv" )
+    return cmds
+
+def read():
+    global cmds
+    msg = None
+    inf = open( default_cmd_path, "r" )
+    cmds = [ k.strip() for k in inf ]
+    inf.close()
+    scoreboard = Scoreboard( UID_path )
     check = 0
     check_msg = 's'
     while check < 3:
@@ -74,7 +87,8 @@ def read():
             check += 1
         elif check > 0:
             check -= 1
-        print( "check state", check, "(", check_msg, "sent", msg, "recieved", ')' )
+        print( "checking...", check, "(", check_msg, "sent", msg, "recieved", ')' )
+    print( "done" )
 
     while True:
         if bt.waiting():
@@ -83,7 +97,7 @@ def read():
             except UnicodeDecodeError:
                 continue
             print( msg )
-            if not halt:
+            if not input_cmd_manually:
                 if msg is not None:
                     if msg == "track":
                         bt.write( cmds[cmd_counter] + '\n' )
@@ -116,6 +130,11 @@ if __name__ == "__main__":
 
         msgWrite = input()
         if msgWrite == "exit": sys.exit()
-        bt.write(msgWrite + "\n")
+        if msgWrite[:4] == "load":
+            cmds = read_cmd( msgWrite[4:].strip() )
+        else:
+            bt.write(msgWrite + "\n")
+
+
 
 

@@ -1,10 +1,4 @@
-nf
-nf
 nl
-ng
-nr
-nf
-nr
 nl
 ng
 nl
@@ -27,10 +21,14 @@ ng
 nf
 ng
 nr
+nr
+nr
+ng
 nl
 nf
 nf
 nf
+nf
 ng
 nr
 nr
@@ -40,4 +38,5 @@ nr
 ng
 nr
 nr
+ng
 done

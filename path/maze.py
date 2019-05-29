@@ -97,6 +97,7 @@ class Maze:
         path_len = dict()
         deadends = [ start_point ] + _deadends
         for i in deadends:
+            print( "generating from", i )
             path_list = self.shortestPath_list( i, deadends )
             for j in path_list:
                 path_len[(i,j)] = path_list[ j ] 
@@ -138,6 +139,7 @@ class Maze:
                 cmds.append('nf')
             if A==2 or A==-2:
                 cmds.append('ng')
+        cmds.append( 'ng' )
         print(cmds)
         for c in cmds:
             cmd.write( c + '\n' )
